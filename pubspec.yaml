@@ -30,6 +30,7 @@ environment:
 dependencies:
   http: 
   provider:
+  shared_preferences: ^2.2.2
   flutter:
     sdk: flutter
 

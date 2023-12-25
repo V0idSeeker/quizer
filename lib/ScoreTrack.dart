@@ -2,45 +2,41 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Scoretrack extends ChangeNotifier {
 
-  int Score =0;
-final file = File('score_data.json');
+  late int Score ;
+  Map<String, Object?>prefs={};
   Future<void> checkScore() async {
-
-     
-
-  // Create the file if it doesn't exist
-  if (!await file.exists()) {
-    await file.create(recursive: true);
-    await file.writeAsString(jsonEncode({'score': 0}));
-  } else {
-    
-    final jsonData = jsonDecode(await file.readAsString()); 
-  }
-  final jsonData = jsonDecode(await file.readAsString()); 
-  Score=   int.parse( jsonData.toString() );
+   /* final SharedPreferences prefs = await SharedPreferences.getInstance();
+  if(prefs.getInt('counter')==null)await prefs.setInt('score',0);
+  Score=int.parse(prefs.getInt('counter').toString());
+  */
+    Score=0;
+    prefs["score"]=Score;
   notifyListeners();
   }
 
   Future<void> UpdateScore()async {
     Score++;
-    final jsonData = jsonDecode(await file.readAsString());
-    jsonData['score'] = Score;
+    print(prefs);
+    /*final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-    // Write the updated data back to the file
-    await file.writeAsString(jsonEncode(jsonData));
+    await prefs.setInt('score',Score) ;*/
+    prefs["score"]=Score;
     notifyListeners();
+
   }
 
   Future<void> ResetScore()async {
     Score=0;
-    final jsonData = jsonDecode(await file.readAsString());
-    jsonData['score'] = Score;
 
-    // Write the updated data back to the file
-    await file.writeAsString(jsonEncode(jsonData));
+    /*final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await prefs.setInt('score',Score) ;*/
+    prefs["score"]=Score;
+    print(prefs);
     notifyListeners();
   }
 

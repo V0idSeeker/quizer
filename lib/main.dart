@@ -31,47 +31,44 @@ class MyHomePage extends StatelessWidget {
         providers: [
           ChangeNotifierProvider(create: (context) => Scoretrack()),
         ],
-        builder: (context, widget){
-        return  Scaffold(
-          body: Center(
-              child: Column(
-            children: [
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Image(image: AssetImage("/image.png")),
+        builder: (context, widget) {
+          return Scaffold(
+            body: Center(
+                child: Column(
+              children: [
+                Expanded(
+                  flex: 3,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Image.asset("images/image.png"),
+                  ),
                 ),
-              ),
-              Expanded(
-                child: Center(
-                    child: FutureBuilder(
-                        future: Provider.of<Scoretrack>(context).checkScore(),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting)
-                            return CircularProgressIndicator();
-                          if (snapshot.hasError) return Text("Erore");
-                          return Text(
-                              "Highest score : + ${Provider.of<Scoretrack>(context).Score}");
-                        })),
-              )
-            ],
-          )),
-          floatingActionButton: MaterialButton(
-            color: Colors.blue,
-            child: Text("Play"),
-            onPressed: () {
-              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GameScreen()),
-                              );
-            },
-          ),
-        );
-        }
-    );
-    
-    }
+                Expanded(
+                  child: Center(
+                      child: FutureBuilder(
+                          future: Provider.of<Scoretrack>(context).checkScore(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting)
+                              return CircularProgressIndicator();
+                            if (snapshot.hasError) return Text("Erore");
+                            return Text(
+                                "Highest score : + ${Provider.of<Scoretrack>(context).Score}");
+                          })),
+                )
+              ],
+            )),
+            floatingActionButton: MaterialButton(
+              color: Colors.blue,
+              child: Text("Play"),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GameScreen()),
+                );
+              },
+            ),
+          );
+        });
+  }
 }

@@ -17,61 +17,73 @@ class GameScreen extends StatelessWidget {
       builder: (context, child) {
         final scoretrack = Provider.of<Scoretrack>(context);
         final getter = Provider.of<Quizgeter>(context);
+        scoretrack.checkScore();
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(child: Text("Score : ${scoretrack.Score}")),
-            Expanded(
-                flex: 6,
-                child: FutureBuilder(
-                  future: getter.getQuizes(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return CircularProgressIndicator();
-                    if (snapshot == null ||
-                        snapshot.data?["Error"] == "connection failed")
-                      return Center(
-                        child: Text("Connection error"),
-                      );
-                    String qst = snapshot.data!["question"].toString();
-                    List<Map<String, Object?>> answers =
-                        snapshot.data!["answers"] as List<Map<String, Object?>>;
+        return Scaffold(
 
-                    return ListView.separated(
-                      separatorBuilder: (BuildContext context, int index) =>
-                          Divider(),
-                      itemCount: answers.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Center(
-                              child: Text(answers[index]["answer"].toString())),
-                          onTap: () {
-                            if (answers[index]["correct"].toString() ==
-                                "true") {
-                              scoretrack.UpdateScore();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GameScreen()),
-                              );
-                            } else {
-                              scoretrack.ResetScore();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GameScreen()),
-                              );
-                            }
-                          },
+          body: WillPopScope(
+            onWillPop: ()async {
+              return false ;
+               },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(flex:2,child: Text("Score : ${scoretrack.Score}")),
+                Expanded(
+                    flex: 6,
+                    child: FutureBuilder(
+                      future: getter.getQuizes(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting)
+                          return Center(child: CircularProgressIndicator());
+                        if (snapshot == null ||
+                            getter.quize["Error"] == "connection failed")
+                          return Center(
+                            child: Text("Connection error"),
+                          );
+                        String qst = getter.quize["question"].toString();
+                        List<Map<String, Object?>> answers =
+                        getter.quize["answers"] as List<Map<String, Object?>>;
+
+                        return Column(
+                          children: [
+                            Container(margin : EdgeInsets.fromLTRB(20, 10, 20, 10) ,color: Theme.of(context).focusColor,alignment: Alignment.center,child: Text(qst)),
+                            Container(alignment: Alignment.center,child: Text("Score ${scoretrack.Score}"),),
+                            Divider(),
+                            Expanded(
+                              child: ListView.separated(
+                                separatorBuilder: (BuildContext context, int index) =>
+                                    Divider(),
+                                itemCount: answers.length,
+                                itemBuilder: (context, index) {
+                                  return Center(
+                                    child: ListTile(
+                                      textColor: Theme.of(context).colorScheme.primary ,
+                                      title: Center(
+                                          child: Text(answers[index]["answer"].toString())),
+                                      onTap: () async{
+                                        if (answers[index]["correct"].toString() ==
+                                            "true") {
+                                          await scoretrack.UpdateScore();
+                                          await getter.getQuizes();
+                                        } else {
+                                          await scoretrack.ResetScore();
+                                          await getter.getQuizes();
+                                        }
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         );
                       },
-                    );
-                  },
-                ))
-          ],
-        );
+                    ))
+              ],
+            ),
+          ));
       },
     );
   }
